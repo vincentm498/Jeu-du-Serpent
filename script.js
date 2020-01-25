@@ -108,7 +108,7 @@ window.onload = function () {
             var minX = 0;
             var minY = 0;
             var maxX = widthInBlocks - 1;
-            var maxY = widthInBlocks - 1;
+            var maxY = heightInBlocks - 1;
             var isNotBetweenHorizontalWalls = snakeX < minX || snakeX > maxX;
             var isNotBetweenVerticalWalls = snakeY < minY || snakeY > maxY;
 
