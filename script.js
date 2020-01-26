@@ -22,7 +22,9 @@ window.onload = function () {
         snakee = new Snake([
             [6, 4],
             [5, 4],
-            [4, 4]
+            [4, 4],
+            [3, 4],
+            [2, 4]
         ], "right");
         applee = new Apple([10, 10]);
         refreshCanvas();
@@ -31,13 +33,24 @@ window.onload = function () {
     function refreshCanvas() {
         snakee.advance();
         if (snakee.checkCollision()) {
-
+            gameOver();
         } else {
+            if (snakee.isEatingApple(applee)) {
+                snakee.ateApple = true;
+                do {
+                    applee.setNewPosition();
+                } while (applee.isOnSnake(snakee))
+
+            };
             ctx.clearRect(0, 0, canvasWidth, canvasHeight);
             snakee.draw();
             applee.draw();
             setTimeout(refreshCanvas, delay);
         }
+
+    }
+
+    function gameOver() {
 
     }
 
@@ -50,6 +63,7 @@ window.onload = function () {
     function Snake(body, direction) {
         this.body = body;
         this.direction = direction;
+        this.ateApple = false;
         this.draw = function () {
             ctx.save();
             ctx.fillStyle = "#ff0000";
@@ -77,8 +91,13 @@ window.onload = function () {
                     throw ("direction invalide");
             };
             this.body.unshift(nextPosition);
-            this.body.pop();
-            //console.log("pas de problemes")
+
+            if (!this.ateApple) {
+                this.body.pop();
+            } else {
+                this.ateApple = false;
+            }
+
         };
         this.setDirection = function (newDirection) {
             var allowedDirections;
@@ -123,6 +142,14 @@ window.onload = function () {
             }
             return wallCollision || snakeCollision;
         };
+        this.isEatingApple = function (appleToEat) {
+            var head = this.body[0];
+            if (head[0] === appleToEat.position[0] && head[1] === appleToEat.position[1]) {
+                return true;
+            } else {
+                return false;
+            }
+        };
     }
 
     function Apple(position) {
@@ -132,11 +159,25 @@ window.onload = function () {
             ctx.fillStyle = "#33cc33";
             ctx.beginPath();
             var radius = blockSize / 2;
-            var x = position[0] * blockSize + radius;
-            var y = position[1] * blockSize + radius;
+            var x = this.position[0] * blockSize + radius;
+            var y = this.position[1] * blockSize + radius;
             ctx.arc(x, y, radius, 0, Math.PI * 2, true);
             ctx.fill();
             ctx.restore();
+        };
+        this.setNewPosition = function () {
+            var newX = Math.round(Math.random() * (widthInBlocks - 1));
+            var newY = Math.round(Math.random() * (heightInBlocks - 1));
+            this.position = [newX, newY];
+        };
+        this.isOnSnake = function (snakeToCheck) {
+            var isOnSnake = false;
+            for (var i = 0; i < snakeToCheck.body.length; i++) {
+                if (this.position[0] == snakeToCheck.body[i][0] && this.position[1] == snakeToCheck.body[i][1]) {
+                    isOnSnake = true;
+                }
+            }
+            return isOnSnake;
         };
     };
 
